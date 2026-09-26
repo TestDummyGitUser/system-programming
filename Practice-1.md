@@ -1,97 +1,93 @@
-### Задание 1
+### Задание №1
+**Цель задания:** изучить, как выглядят инструкции, написанные на языке *C* для `a / b` на *Assembly clang* и *Assembly GCC*.
 
-**Код на C:**
 ```c
+// Код на C
 long pw1(long a, long b){
     return a / b;
 }
-```
 
-**Код на assembly gcc:**
-```assembly
-        mov     rax, rdi
-        .loc 1 2 14 view .LVU3
-        cqo
-        idiv    rsi
-        .loc 1 3 1 view .LVU4
-        ret
-```
+// Код на Assembly GCC
+mov     rax, rdi
+.loc 1 2 14 view .LVU3
+cqo
+idiv    rsi
+.loc 1 3 1 view .LVU4
+ret
 
-**Код на assembly clang:**
-```assembly
-        mov     rax, rdi
-        .loc    1 2 14 prologue_end
-        mov     rcx, rdi
-        or      rcx, rsi
-        shr     rcx, 32
-        je      .LBB0_1
-        cqo
-        idiv    rsi
-        .loc    1 2 5 is_stmt 0
-        ret
+// Код на Assembly Clang
+mov     rax, rdi
+.loc    1 2 14 prologue_end
+mov     rcx, rdi
+or      rcx, rsi
+shr     rcx, 32
+je      .LBB0_1
+cqo
+idiv    rsi
+.loc    1 2 5 is_stmt 0
+ret
 ```
+Исходный код: 
+
+**Вывод:** в компиляторе *GCC* деление `a / b` реализуется напрямую через базовую последовательность команд `cqo` (расширение знака регистра `rax` в `rdx`) и `idiv` (знаковое деление). Компилятор *Clang* генерирует более сложный код с оптимизацией: перед делением он выполняет проверку значений в регистрах с помощью команд `or`, `shr` и `je`.
 
 ---
 
 ### Задание 2
 
-**Код на C:**
 ```c
+// Код на C
 int pw2(int a){
     return ((a & 0x00FF) << 8) | ((a & 0xFF00) >> 8);
 }
-```
 
-**Код на assembly gcc:**
-```assembly
-        push    rbp
-        .cfi_def_cfa_offset 16
-        .cfi_offset 6, -16
-        mov     rbp, rsp
-        .cfi_def_cfa_register 6
-        mov     DWORD PTR [rbp-4], edi
-        .loc 1 2 26
-        mov     eax, DWORD PTR [rbp-4]
-        sal     eax, 8
-        movzx   edx, ax
-        .loc 1 2 48
-        mov     eax, DWORD PTR [rbp-4]
-        sar     eax, 8
-        movzx   eax, al
-        .loc 1 2 32
-        or      eax, edx
-        .loc 1 3 1
-        pop     rbp
-        .cfi_def_cfa 7, 8
-        ret
-```
+// Код на Assembly GCC
+push    rbp
+.cfi_def_cfa_offset 16
+.cfi_offset 6, -16
+mov     rbp, rsp
+.cfi_def_cfa_register 6
+mov     DWORD PTR [rbp-4], edi
+.loc 1 2 26
+mov     eax, DWORD PTR [rbp-4]
+sal     eax, 8
+movzx   edx, ax
+.loc 1 2 48
+mov     eax, DWORD PTR [rbp-4]
+sar     eax, 8
+movzx   eax, al
+.loc 1 2 32
+or      eax, edx
+.loc 1 3 1
+pop     rbp
+.cfi_def_cfa 7, 8
+ret
 
-**Код на assembly clang:**
-```assembly
-        push    rbp
-        .cfi_def_cfa_offset 16
-        .cfi_offset rbp, -16
-        mov     rbp, rsp
-        .cfi_def_cfa_register rbp
-        mov     dword ptr [rbp - 4], edi
-        .loc    1 2 14 prologue_end
-        mov     eax, dword ptr [rbp - 4]
-        .loc    1 2 16 is_stmt 0
-        and     eax, 255
-        .loc    1 2 26
-        shl     eax, 8
-        .loc    1 2 36
-        mov     ecx, dword ptr [rbp - 4]
-        .loc    1 2 38
-        and     ecx, 65280
-        .loc    1 2 48
-        sar     ecx, 8
-        .loc    1 2 32
-        or      eax, ecx
-        .loc    1 2 5 epilogue_begin
-        pop     rbp
-        .cfi_def_cfa rsp, 8
-        ret
+// Код на Assembly Clang
+push    rbp
+.cfi_def_cfa_offset 16
+.cfi_offset rbp, -16
+mov     rbp, rsp
+.cfi_def_cfa_register rbp
+mov     dword ptr [rbp - 4], edi
+.loc    1 2 14 prologue_end
+mov     eax, dword ptr [rbp - 4]
+.loc    1 2 16 is_stmt 0
+and     eax, 255
+.loc    1 2 26
+shl     eax, 8
+.loc    1 2 36
+mov     ecx, dword ptr [rbp - 4]
+.loc    1 2 38
+and     ecx, 65280
+.loc    1 2 48
+sar     ecx, 8
+.loc    1 2 32
+or      eax, ecx
+.loc    1 2 5 epilogue_begin
+pop     rbp
+.cfi_def_cfa rsp, 8
+ret
 ```
 
 ---
