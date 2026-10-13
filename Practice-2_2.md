@@ -225,6 +225,8 @@ int main() {
     return 0;
 }
 ```
+Ссылка на исходный код: https://godbolt.org/z/dvfv68b3d
+
 ---
 
 ### Задание №2. Проверка на NaN
@@ -253,6 +255,8 @@ int main() {
     printf("\nAnswer: %d", is_nan(0.0f));
 }
 ```
+Ссылка на исходный код: https://godbolt.org/z/1dxGGaP7T
+
 ---
 
 ### Задание №3. Fast inverse square root
